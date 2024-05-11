@@ -4,15 +4,10 @@
 
 static const char *TAG = "BMP180";
 
-#define BMP180_ADDRESS 0x77         // BMP180のI2Cアドレス
-#define I2C_MASTER_SCL_IO 21        /*!< gpio number for I2C master clock */
-#define I2C_MASTER_SDA_IO 22        /*!< gpio number for I2C master data  */
-#define I2C_MASTER_FREQ_HZ 400000   /*!< I2C master clock frequency */
-#define I2C_MASTER_TX_BUF_DISABLE 0 /*!< I2C master do not need buffer */
-#define I2C_MASTER_RX_BUF_DISABLE 0 /*!< I2C master do not need buffer */
-#define ACK_CHECK_EN 0x1            // I2C master will check ack from slave
-#define CHIP_ID_REG_ADDR 0xD0       // チップIDレジスタのアドレス
-#define CHIP_ID_EXPECTED 0x55       // 期待されるチップID
+#define BMP180_ADDRESS 0x77   // BMP180のI2Cアドレス
+#define ACK_CHECK_EN 0x1      // I2C master will check ack from slave
+#define CHIP_ID_REG_ADDR 0xD0 // チップIDレジスタのアドレス
+#define CHIP_ID_EXPECTED 0x55 // 期待されるチップID
 #define BMP180_ULTRA_HIGH_RES 3
 #define BMP180_CALIB_DATA_START 0xAA // 校正データの開始レジスタアドレス
 #define BMP180_CALIB_DATA_SIZE 22    // 校正データのサイズ（バイト）
@@ -190,8 +185,9 @@ static void parse_bmp180_coefficients(uint8_t *coefficients)
   MC = (coefficients[18] << 8) | coefficients[19];
   MD = (coefficients[20] << 8) | coefficients[21];
 
-  ESP_LOGI(TAG, "Coefficients:\nAC1=%d\nAC2=%d\nAC3=%d\nAC4=%u\nAC5=%u\nAC6=%u\nB1=%d\nB2=%d\nMB=%d\nMC=%d\nMD=%d\n",
-           AC1, AC2, AC3, AC4, AC5, AC6, B1, B2, MB, MC, MD);
+  ESP_LOGI(TAG, "Coefficients:\nAC1=%d\nAC2=%d\nAC3=%d\nAC4=%u\nAC5=%u\nAC6=%u\nB1=%d\nB2=%d\nMB=%d\nMC=%d\nMD=%d",
+           AC1,
+           AC2, AC3, AC4, AC5, AC6, B1, B2, MB, MC, MD);
 }
 
 static esp_err_t read_chip_id(uint8_t *chip_id)
@@ -234,7 +230,7 @@ static void compute(int16_t ut, uint32_t up)
   B5 = X1 + X2;
   int T = (B5 + 8) >> 4; // Temperature in 0.1C units
 
-  ESP_LOGI(TAG, "Measured temperature: %.1f C\n", T / 10.0);
+  ESP_LOGI(TAG, "Measured temperature: %.1f C", T / 10.0);
 
   // Calculate true pressure
   B6 = B5 - 4000;
@@ -260,7 +256,7 @@ static void compute(int16_t ut, uint32_t up)
   X2 = (-7357 * p) >> 16;
   p = p + ((X1 + X2 + 3791) >> 4); // Pressure in Pa
 
-  ESP_LOGI(TAG, "Measured air pressure: %.2f hPa\n", p / 100.0);
+  ESP_LOGI(TAG, "Measured air pressure: %.2f hPa", p / 100.0);
 }
 
 void bmp180_monitor(void)

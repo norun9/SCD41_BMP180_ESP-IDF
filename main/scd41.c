@@ -1,21 +1,3 @@
-/* i2c - Simple example
-
-   Simple I2C example that shows how to initialize I2C
-   as well as reading and writing from and to registers for a sensor connected over I2C.
-
-   The sensor used in this example is a MPU9250 inertial measurement unit.
-
-   For other examples please check:
-   https://github.com/espressif/esp-idf/tree/master/examples
-
-   See README.md file to get detailed usage of this example.
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <stdint.h>
 #include <stdio.h>
 #include "esp_err.h"
@@ -26,7 +8,7 @@
 #include "freertos/FreeRTOS.h"
 #include "portmacro.h"
 
-static const char *TAG = "i2c-simple-example";
+static const char *TAG = "SCD41";
 
 #define I2C_MASTER_NUM 0 /*!< I2C master i2c port number, the number of i2c peripheral interfaces available will depend on the chip */
 #define I2C_MASTER_TIMEOUT_MS 1000
@@ -133,7 +115,7 @@ static void scd41_calculate_and_show_data(uint8_t *raw)
   double temperature = -45 + 175 * (raw_temperature / (double)0xffff);
   double humidity = 100 * (raw_humidity / (double)0xffff);
 
-  printf("SCD41: CO2: %d (ppm), temperature: %.02f C, humidity: %.02f %%\n", co2, temperature, humidity);
+  ESP_LOGI(TAG, "CO2: %d (ppm), temperature: %.02f C, humidity: %.02f %%", co2, temperature, humidity);
 }
 
 void scd41_poll()
@@ -142,7 +124,7 @@ void scd41_poll()
 
   if (!scd41_get_data_ready_status())
   {
-    printf("SCD41: no new data available\n");
+    ESP_LOGI(TAG, "no new data available");
     return;
   }
 
@@ -163,7 +145,7 @@ void scd41_init()
 
   vTaskDelay(1000 / portTICK_PERIOD_MS);
   ESP_ERROR_CHECK(scd41_start_periodic_measurements());
-  printf("SCD41: initialization finished\n");
+  ESP_LOGI(TAG, "initialization finished");
 }
 
 void scd41_monitor(void)
